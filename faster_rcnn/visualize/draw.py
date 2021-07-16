@@ -16,6 +16,7 @@ COLORS_10 =[(144,238,144),(178, 34, 34),(221,160,221),(  0,255,  0),(  0,128,  0
             (218,165, 32),(255,250,240),(253,245,230),(244,164, 96),(210,105, 30)]
 
 
+'''
 def draw_bboxes(img, bbox, identities=None, class_ids=None, offset=(0,0)):
     for i,box in enumerate(bbox):
         x1,y1,x2,y2 = [int(i) for i in box]
@@ -36,7 +37,32 @@ def draw_bboxes(img, bbox, identities=None, class_ids=None, offset=(0,0)):
         cv2.putText(img, label, (x1,y1+t_size[1]+4), cv2.FONT_HERSHEY_PLAIN, 2, [255, 255, 255], 2)
 
     return img
+'''
 
+def draw_bboxes(img, boxes, labels, scores, category, threshold, offset=(0,0)):
+    for i, box in enumerate(boxes):
+        x1, y1, x2, y2 = [int(i) for i in box]
+        x1 += offset[0]
+        x2 += offset[0]
+        y1 += offset[1]
+        y2 += offset[1]
+        color = COLORS_10[i % len(COLORS_10)]
+
+        label = labels[i]
+        category_name = category[label]
+        score = scores[i]
+
+        if score < threshold:
+            continue
+
+        label = '{}{}:{}'.format("", category_name, str(round(score, 2)))
+        # label = '{}{:d}'.format("", id)
+        t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, 2, 2)[0]
+        cv2.rectangle(img, (x1, y1), (x2, y2), color, 3)
+        cv2.rectangle(img, (x1, y1), (x1+t_size[0]+3, y1+t_size[1]+4), color, -1)
+        cv2.putText(img, label, (x1, y1 + t_size[1] + 4), cv2.FONT_HERSHEY_PLAIN, 1.5, [255, 255, 255], 2)
+
+    return img
 
 def get_coco_labels(json_path):
     with open(json_path) as f:
