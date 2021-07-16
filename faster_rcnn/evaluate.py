@@ -44,7 +44,7 @@ def main(args):
     # Data loading code
     print("Loading data")
 
-    dataset_test, num_classes = get_dataset(args.dataset, "test", get_transform(False, args.data_augmentation), args.data_path)
+    dataset_test, num_classes = get_dataset(args.dataset, "val", get_transform(False, args.data_augmentation), args.data_path)
 
     print("Creating data loaders")
     if args.distributed:
@@ -65,8 +65,10 @@ def main(args):
     if "rcnn" in args.model:
         if args.rpn_score_thresh is not None:
             kwargs["rpn_score_thresh"] = args.rpn_score_thresh
-    model = torchvision.models.detection.__dict__[args.model](num_classes=num_classes, pretrained=args.pretrained,
+    model = torchvision.models.detection.__dict__[args.model](num_classes=num_classes, pretrained=False,
                                                               **kwargs)
+    checkpoint = torch.load(args.weight_path)
+    model.load_state_dict(checkpoint['model'])
     model.to(device)
     if args.distributed and args.sync_bn:
         model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)

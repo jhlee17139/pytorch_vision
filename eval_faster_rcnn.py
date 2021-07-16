@@ -1,4 +1,4 @@
-from faster_rcnn.train import main
+from faster_rcnn.evaluate import main
 
 
 def get_args_parser(add_help=True):
@@ -57,6 +57,11 @@ def get_args_parser(add_help=True):
         help="Use pre-trained models from the modelzoo",
         action="store_true",
         default=True
+    )
+    parser.add_argument(
+        "--weight-path",
+        type=str,
+        default='.\\output\\weight\\model_0.pth'
     )
 
     # distributed training parameters
